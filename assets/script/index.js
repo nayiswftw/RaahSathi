@@ -22,7 +22,11 @@ window.addEventListener('resize', () => {
 
 const init = () => {
     if (isDesktopMatched) addEventListeners();
-    else alert('Please use a desktop device');
+    else mobileWarning();
+};
+
+const mobileWarning = () => {
+    document.body.innerHTML = '<h1>Please use a desktop for the best experience.</h1>';
 };
 
 const addEventListeners = () => {
