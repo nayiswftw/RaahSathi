@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RaahSathi - Customize your travel experience by sharing your preferences">
+    <title>RaahSathi - Travel Preferences</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --transition-fast: 200ms;
+            --transition-normal: 300ms;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        } */
+
+        .navbar {
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color var(--transition-fast) ease;
+        } */
+
+        /* .navbar-brand:hover {
+            color: var(--primary-hover);
+        } */
+
+        .selection-group {
+            margin-bottom: 3rem;
+        }
+
+        .form-label {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            border: 2px solid transparent;
+            border-radius: var(--border-radius-md);
+            padding: 2rem;
+            background-color: var(--card-background);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(var(--primary-color), 0.1));
+            opacity: 0;
+            transition: opacity var(--transition-normal) ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        .card[aria-pressed="true"] {
+            border-color: var(--primary-color);
+            background-color: rgba(0, 123, 255, 0.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 2px solid #dee2e6;
+            border-radius: var(--border-radius-sm);
+            transition: border-color var(--transition-fast) ease, box-shadow var(--transition-fast) ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        .form-control.error {
+            border-color: var(--error-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity var(--transition-fast) ease, transform var(--transition-fast) ease;
+        }
+
+        .error-message.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: var(--border-radius-sm);
+            color: white;
+            cursor: pointer;
+            transition: background-color var(--transition-fast) ease, transform var(--transition-fast) ease;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            background-color: var(--secondary-color);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            margin-left: 0.75rem;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                min-height: 180px;
+                padding: 1.5rem;
+            }
+
+            .form-label {
+                font-size: 1.125rem;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .card-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container">
+          <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="assets/logo.svg" alt="RaahSathi Logo" height="24" class="d-inline-block align-text-top">
+            <span class="ms-2">RaahSathi</span> 
+          </a>
+        </div>
+      </nav>
+
+    <main class="container p-5">
+        <form id="travelPreferencesForm" novalidate>
+            <div class="row mb-4">
+                <div class="col">
+                    <h1>Tell us your travel preferences</h1>
+                    <p class="lead">Provide some basic information, and our trip planner will generate a customized
+                        itinerary based on your preferences.</p>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col">
+                    <label for="destination" class="form-label">What is your destination of choice?</label>
+                    <input type="text" id="destination" name="destination" class="form-control"
+                        placeholder="Enter your destination" required minlength="2" maxlength="100">
+                    <div class="error-message" id="destination-error">Please enter a valid destination</div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col">
+                    <label for="days" class="form-label">How many days are you planning your trip?</label>
+                    <input type="number" id="days" name="days" class="form-control" placeholder="Ex: 3" required min="1"
+                        max="90">
+                    <div class="error-message" id="days-error">Please enter a number between 1 and 90</div>
+                </div>
+            </div>
+
+            <section class="selection-group" aria-labelledby="budget-label">
+                <h2 id="budget-label" class="form-label">What is your budget?</h2>
+                <div class="card-container" role="radiogroup" aria-required="true">
+                    <button type="button" class="card" data-group="budget" data-value="Budget-Friendly"
+                        aria-pressed="false" role="radio">
+                        <h3 class="card-title">Budget-Friendly</h3>
+                        <p class="card-text">Travel smart, spend less</p>
+                    </button>
+                    <button type="button" class="card" data-group="budget" data-value="Moderate" aria-pressed="false"
+                        role="radio">
+                        <h3 class="card-title">Moderate</h3>
+                        <p class="card-text">Balance comfort and cost</p>
+                    </button>
+                    <button type="button" class="card" data-group="budget" data-value="Luxury" aria-pressed="false"
+                        role="radio">
+                        <h3 class="card-title">Luxury</h3>
+                        <p class="card-text">Indulge in lavish experiences</p>
+                    </button>
+                </div>
+                <div class="error-message" id="budget-error">Please select a budget option</div>
+            </section>
+
+            <section class="selection-group" aria-labelledby="companions-label">
+                <h2 id="companions-label" class="form-label">Who do you plan to travel with?</h2>
+                <div class="card-container" role="radiogroup" aria-required="true">
+                    <button type="button" class="card" data-group="companions" data-value="Solo-Adventure"
+                        aria-pressed="false" role="radio">
+                        <h3 class="card-title">Solo Adventure</h3>
+                        <p class="card-text">Embark on a journey of self-discovery</p>
+                    </button>
+                    <button type="button" class="card" data-group="companions" data-value="Romantic-Getaway"
+                        aria-pressed="false" role="radio">
+                        <h3 class="card-title">Romantic Getaway</h3>
+                        <p class="card-text">Experience the world together</p>
+                    </button>
+                    <button type="button" class="card" data-group="companions" data-value="Family-Fun"
+                        aria-pressed="false" role="radio">
+                        <h3 class="card-title">Family Fun</h3>
+                        <p class="card-text">Create unforgettable memories with loved ones</p>
+                    </button>
+                    <button type="button" class="card" data-group="companions" data-value="Friends-Escapade"
+                        aria-pressed="false" role="radio">
+                        <h3 class="card-title">Friends' Escapade</h3>
+                        <p class="card-text">Thrilling adventures with your best pals</p>
+                    </button>
+                </div>
+                <div class="error-message" id="companions-error">Please select who you're traveling with</div>
+            </section>
+
+            <div class="row">
+                <div class="col">
+                    <button type="submit" id="submitBtn" class="btn btn-primary">
+                        Generate Itinerary
+                        <span class="loading"><i class="fas fa-spinner fa-spin"></i></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+
+        <!-- <footer>
+            <nav class="navbar">
+                <div class="container justify-content-between">
+
+                    <div class="navbar-brand">
+                        <img src="assets/logo.svg">
+                    </div>
+
+                    <div class="navbar-text d-flex flex-column text-center">
+                        <span>Copyright &copy; RaahSathi 2023</span>
+                        <span class="ms-3">All rights reserved.</span>
+                    </div>
+
+                    <ul class="navbar-nav">
+                        <li><i class="fa fa-github" aria-hidden="true"></i> Github</li>
+                        <li><i class="fa fa-linkedin" aria-hidden="true"></i> LinkedIn</li>
+                    </ul>
+                </div>
+            </nav>
+        </footer> -->
+        <footer class="mt-5">
+            <nav class="navbar navbar-light bg-light">
+            <div class="container justify-content-between">
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="assets/logo.svg" alt="RaahSathi Logo" height="24" class="d-inline-block align-text-top">
+                <span class="ms-2">RaahSathi</span>
+                </a>
+                <div class="navbar-text text-center">
+                <span>&copy; RaahSathi 2023. All rights reserved.</span>
+                </div>
+                <ul class="navbar-nav d-flex flex-row">
+                <li class="nav-item me-3">
+                    <a class="nav-link" href="https://github.com" target="_blank">
+                    <i class="fa fa-github" aria-hidden="true"></i> Github
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://linkedin.com" target="_blank">
+                    <i class="fa fa-linkedin" aria-hidden="true"></i> LinkedIn
+                    </a>
+                </li>
+                </ul>
+            </div>
+            </nav>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('travelPreferencesForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const cards = document.querySelectorAll('.card');
+            const loadingSpinner = document.querySelector('.loading');
+
+            // Store form data
+            const formData = {
+                destination: '',
+                days: '',
+                budget: '',
+                companions: ''
+            };
+
+            // Handle card selection
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const group = card.dataset.group;
+                    const value = card.dataset.value;
+
+                    // Deselect all cards in the same group
+                    cards.forEach(c => {
+                        if (c.dataset.group === group) {
+                            c.setAttribute('aria-pressed', 'false');
+                        }
+                    });
+
+                    // Select the clicked card
+                    card.setAttribute('aria-pressed', 'true');
+                    formData[group] = value;
+
+                    // Hide error message if present
+                    document.getElementById(`${group}-error`).classList.remove('visible');
+                });
+
+                // Add keyboard support
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
+                        card.click();
+                    }
+                });
+            });
+
+            // Validate form inputs
+            const validateInput = (input) => {
+                const isValid = input.checkValidity();
+                const errorElement = document.getElementById(`${input.id}-error`);
+
+                if (!isValid) {
+                    input.classList.add('error');
+                    errorElement.classList.add('visible');
+                    return false;
+                }
+
+                input.classList.remove('error');
+                errorElement.classList.remove('visible');
+                return true;
+            };
+
+            // Handle input changes
+            ['destination', 'days'].forEach(inputId => {
+                const input = document.getElementById(inputId);
+                input.addEventListener('input', (e) => {
+                    formData[inputId] = e.target.value;
+                    validateInput(input);
+                });
+            });
+
+            // Form submission
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                let isValid = true;
+
+                // Validate text inputs
+                ['destination', 'days'].forEach(inputId => {
+                    const input = document.getElementById(inputId);
+                    if (!validateInput(input)) {
+                        isValid = false;
+                    }
+                });
+
+                // Validate card selections
+                ['budget', 'companions'].forEach(group => {
+                    if (!formData[group]) {
+                        document.getElementById(`${group}-error`).classList.add('visible');
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    return;
+                }
+
+                // Disable form during submission
+                submitBtn.disabled = true;
+                loadingSpinner.style.display = 'inline-block';
+
+                try {
+                    // Simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Handle successful submission
+                    console.log('Form submitted:', formData);
+                    // Redirect or show success message
+
+                } catch (error) {
+                    console.error('Submission error:', error);
+                    // Show error message to user
+
+                } finally {
+                    submitBtn.disabled = false;
+                    loadingSpinner.style.display = 'none';
+                }
+            });
+
+
+            
+        });
+    </script>
+</body>
+
+</html>
