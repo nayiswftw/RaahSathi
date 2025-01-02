@@ -17,7 +17,7 @@ function Hero() {
                 <div className="relative w-full text-center z-10">
                     <span className='font-bold text-3xl text-white'>Ready to explore?</span>
                     <h1>
-                        <Link to='/create-trip'>
+                        <Link to='/auth'>
                             <Button size='lg' className='rounded-full bg-transparent text-white' variant='outline'>Get Started &rarr;</Button>
                         </Link>
                     </h1>

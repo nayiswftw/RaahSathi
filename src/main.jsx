@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router'
 import Footer from './components/custom/Footer'
 import CreateTrip from './pages/CreateTrip'
 import { Toaster } from './components/ui/toaster'
+import Auth from './pages/Auth'
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
   {
     path: '/create-trip',
     element: <CreateTrip />,
+  },
+  {
+    path: '/auth',
+    element: <Auth />,
   }
 ])
 

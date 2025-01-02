@@ -9,7 +9,7 @@ import TripData from './TripData'
 import { chatSession } from '@/lib/Gemini'
 import { AI_PROMPT } from '@/lib/Constants'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
-import { db } from '@/lib/firebaseConfig'
+import { auth, db } from '@/lib/firebaseConfig'
 import { Link } from 'react-router'
 import { useEffect } from 'react'
 
@@ -52,13 +52,13 @@ function CreateTrip() {
 
         try {
             const result = await chatSession.sendMessage(FINAL_PROMPT);
-            const responseData = await result.response.text();
-            // console.log(responseData);
+            // const responseData = await result.response.text();
+            console.log(result.response.text());
 
-            const docId = 'user';
+            const docId = auth.currentUser.uid;
             await setDoc(doc(db, "TripData", docId), {
                 config: formData,
-                data: JSON.parse(responseData),
+                data: JSON.parse(result.response.text()),
                 id: docId
             });
             
@@ -69,7 +69,7 @@ function CreateTrip() {
     };
 
     const fetchTripData = async () => {
-        const docId = 'user';
+        const docId = auth.currentUser.uid;
         const docRef = doc(db, 'TripData', docId);
         const docSnap = await getDoc(docRef);
 
