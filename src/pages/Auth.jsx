@@ -77,19 +77,20 @@ const Auth = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-slate-500">
-            <Card className="w-full max-w-md mx-4">
-                <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl font-bold text-center">Welcome</CardTitle>
-                    <CardDescription className="text-center">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-slate-500 to-slate-700 p-4">
+            
+            <Card className="w-full max-w-md mx-4 rounded-lg shadow-lg bg-white">
+                <CardHeader className="space-y-1 p-4">
+                    <CardTitle className="text-2xl font-bold text-center text-gray-800">Welcome</CardTitle>
+                    <CardDescription className="text-center text-gray-600">
                         Sign in to your account or create a new one.
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4">
                     <Tabs defaultValue="login" className="w-full">
                         <TabsList className="grid w-full grid-cols-2 mb-4">
-                            <TabsTrigger value="login">Login</TabsTrigger>
-                            <TabsTrigger value="register">Register</TabsTrigger>
+                            <TabsTrigger value="login" className="p-2 text-center">Login</TabsTrigger>
+                            <TabsTrigger value="register" className="p-2 text-center">Register</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="login">

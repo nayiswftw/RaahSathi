@@ -7,6 +7,7 @@ import Footer from './components/custom/Footer'
 import CreateTrip from './pages/CreateTrip'
 import { Toaster } from './components/ui/toaster'
 import Auth from './pages/Auth'
+import MyTrips from './pages/MyTrips'
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: '/auth',
     element: <Auth />,
+  },
+  {
+    path: '/my-trips',
+    element: <MyTrips />
   }
 ])
 

@@ -1,23 +1,23 @@
 export const features = [
-    {
+    {   
         title: "Hotels",
         text: "Stay at the best hotels around the world for the best prices.",
     },
     {
-        title: "Car Rental",
-        text: "Unlock deals on any type of wheels and hit the road.",
+        title: "Itineraries",
+        text: "Plan your trip with detailed itineraries and travel guides.",
     },
     {
-        title: "Flights",
-        text: "Get real-time airfares for anywhere you want to jet off to.",
+        title: "Weather",
+        text: "Get accurate weather forecasts for your travel dates.",
     },
     {
         title: "Restaurants",
         text: "Snag a coveted table at the hottest restaurants.",
     },
     {
-        title: "Experiences",
-        text: "Make reservations for your favorite activities, then make memories.",
+        title: "Budget",
+        text: "Manage your travel budget with detailed cost breakdowns.",
     },
     {
         title: "Tours",

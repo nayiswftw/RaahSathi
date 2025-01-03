@@ -10,8 +10,10 @@ import { chatSession } from '@/lib/Gemini'
 import { AI_PROMPT } from '@/lib/Constants'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebaseConfig'
+import { signOut } from 'firebase/auth'
 import { Link } from 'react-router'
 import { Loader2 } from 'lucide-react'
+import { useNavigate } from 'react-router'
 
 const SelectionCard = memo(({ option, type, value, onClick, description }) => (
     <Card
@@ -47,17 +49,25 @@ function CreateTrip() {
     });
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchTripData = async () => {
-            try {
-                const docSnap = await getDoc(doc(db, 'TripData', auth.currentUser.uid));
-                if (docSnap.exists()) setData(docSnap.data());
-            } catch (error) {
-                console.error("Error fetching trip:", error);
+        // Auth state listener
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            if (user) {
+                setIsAuthenticated(true);
+                fetchTripData(user.uid);
+            } else {
+                setIsAuthenticated(false);
+                setData(null);
             }
-        };
-        fetchTripData();
+        });
+
+        // Cleanup subscription
+        return () => unsubscribe();
+
     }, []);
 
     const handleInputChange = (field) => (e) => {
@@ -83,11 +93,12 @@ function CreateTrip() {
                 .replace('{budget}', formData.budget);
 
             const result = await chatSession.sendMessage(FINAL_PROMPT);
-            const docId = auth.currentUser.uid;
+            const docId = Date.now().toString();
             const newData = {
                 config: formData,
                 data: JSON.parse(result.response.text()),
-                id: docId
+                userID: auth.currentUser.uid,
+
             };
 
             await setDoc(doc(db, "TripData", docId), newData);
@@ -102,6 +113,49 @@ function CreateTrip() {
         setLoading(false);
     };
 
+    const fetchTripData = async (userId) => {
+        try {
+            const docSnap = await getDoc(doc(db, 'TripData', userId));
+            if (docSnap.exists()) {
+                setData(docSnap.data());
+            }
+        } catch (error) {
+            console.error("Error fetching trip:", error);
+            toast({
+                title: "Error fetching trip data",
+                description: "Please try refreshing the page",
+                variant: "destructive"
+            });
+        }
+    };
+    // const myTrips = async () => {
+    //     const docSnaps = await getDocs(collection(db, 'TripData'));
+    //     const userTrips = docSnaps.docs
+    //         .filter(doc => doc.data().userID === auth.currentUser.uid)
+    //         .map(doc => doc.data());
+    //     setData(userTrips);
+    // };
+
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            toast({
+                title: "Logged out successfully",
+
+            });
+            navigate('/auth');
+        } catch (error) {
+            console.error("Error logging out:", error);
+            toast({
+                title: "Error logging out. Please try again.",
+                variant: 'destructive',
+            });
+        }
+
+    };
+
+
     return (
         <>
             <div className='relative min-h-screen overflow-hidden'>
@@ -112,6 +166,28 @@ function CreateTrip() {
                             &#8592; Go back
                         </Button>
                     </Link>
+
+                    {isAuthenticated && (
+                        <>
+                            <Link to='/my-trips'>
+                                <Button
+                                    size='lg'
+                                    className='fixed transform right-40 rounded-full text-white z-20 m-2 md:m-5'
+                                    variant='ghost'
+                                >
+                                    My Trips
+                                </Button>
+                            </Link>
+                            <Button
+                                size='lg'
+                                className='fixed right-2 md:right-5 rounded-full text-white z-20 m-2 md:m-5'
+                                variant='ghost'
+                                onClick={handleLogout}
+                            >
+                                Logout
+                            </Button>
+                        </>
+                    )}
 
                     <ImageCarousel />
 
