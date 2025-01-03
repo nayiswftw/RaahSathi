@@ -1,12 +1,12 @@
 import { Button } from '../ui/button'
 import { Link } from 'react-router';
 import { features } from '../../lib/Constants';
-import Preloader from './Preloader';
+// import Preloader from './Preloader';
 
 function Hero() {
     return (
         <>  
-            <Preloader/>
+            {/* <Preloader/> */}
             <section className='relative flex items-center justify-center min-h-[600px] h-screen bg-black'>
                 <div className="absolute inset-0 overflow-hidden">
                     <img src="/landing.avif" className='absolute object-cover w-full h-full transition-transform duration-[20s] hover:scale-110' alt="Landing" />
