@@ -1,14 +1,12 @@
-import Hero from './components/custom/Hero'
-import { ReactLenis, useLenis } from 'lenis/react'
+import React from 'react'
+import HomePage from './pages/HomePage'
+
 
 
 function App() {
-  const lenis = useLenis(({ scroll }) => {})
   return (
     <>
-      <ReactLenis root>
-        <Hero />
-      </ReactLenis>
+        <HomePage />
     </>
   )
 }

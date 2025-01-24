@@ -3,35 +3,49 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router'
-import Footer from './components/custom/Footer'
-import CreateTrip from './pages/CreateTrip'
-import { Toaster } from './components/ui/toaster'
-import Auth from './pages/Auth'
-import MyTrips from './pages/MyTrips'
+import HomePage from './pages/HomePage'
+import AuthModal from './components/AuthModal'
+import { ClerkProvider } from '@clerk/clerk-react'
+import Dashboard from './pages/Dashboard'
+import ExplorePage from './pages/ExplorePage'
+import TripPlanner from './pages/dashboard/TripPlanner'
 
-const router = createBrowserRouter([
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing Publishable Key")
+}
+
+const routes = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
-  },
-  {
-    path: '/create-trip',
-    element: <CreateTrip />,
+    element: <HomePage />,
   },
   {
     path: '/auth',
-    element: <Auth />,
+    element: <AuthModal />,
   },
   {
-    path: '/my-trips',
-    element: <MyTrips />
+    path: '/dashboard',
+    element: <Dashboard />,
+  },
+  {
+    path: '/explore',
+    element: <ExplorePage />,
+  },
+  {
+    path: 'trip',
+    element: <TripPlanner />,
   }
 ])
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Toaster />
-    <RouterProvider router={router} />
-    <Footer />
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl='/'>
+      <RouterProvider router={routes} >
+        <App />
+      </RouterProvider>
+    </ClerkProvider>
   </StrictMode>,
 )
+
