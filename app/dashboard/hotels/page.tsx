@@ -6,8 +6,18 @@ import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { SparklesText } from '@/components/ui/sparkles-text'
 
+interface Hotel {
+    id: number;
+    name: string;
+    location: string;
+    rating: number;
+    price: number;
+    image: string;
+    amenities: string[];
+}
+
 // Mock data for hotels - in a real app, this would come from an API
-const hotels = [
+const hotels: Hotel[] = [
     {
         id: 1,
         name: 'Luxury Resort & Spa',

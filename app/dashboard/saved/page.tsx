@@ -81,7 +81,7 @@ export default function SavedTripsPage() {
                                                                 <div className="border-t p-4 sm:p-6">
                                                                         <Button
                                                                                 onClick={() => deleteTrip(trip.id)}
-                                                                                variant="destructive"
+                                                                                variant={'destructive'}
                                                                                 className="w-full flex items-center justify-center gap-2 hover:bg-red-600 transition-colors"
                                                                         >
                                                                                 Delete Trip

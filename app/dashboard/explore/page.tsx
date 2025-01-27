@@ -3,9 +3,7 @@
 import React from 'react'
 import { Search, MapPin, Hotel, Utensils, Landmark, Star, StarIcon } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { SparklesText } from '@/components/ui/sparkles-text'
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 
 const categories = [

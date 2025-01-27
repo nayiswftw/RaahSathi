@@ -3,7 +3,7 @@
 import { SignIn } from "@clerk/clerk-react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 const AuthModal = () => {
   const router = useRouter();
@@ -23,7 +23,7 @@ const AuthModal = () => {
 
           <Button
             onClick={() => router.push("/")}
-            variant="ghost"
+            variant={'ghost'}
             className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground"
             aria-label="Return to home page"
           >

@@ -67,7 +67,7 @@ export default function SpotsPage() {
                         type="search"
                     />
                 </div>
-                <Button variant="outline" className="flex items-center gap-2">
+                <Button variant={'outline' as const} className="flex items-center gap-2">
                     <Filter className="h-4 w-4" />
                     Filters
                 </Button>
@@ -100,7 +100,7 @@ export default function SpotsPage() {
                                         ({spot.reviews} reviews)
                                     </span>
                                 </div>
-                                <Button size="sm">View Details</Button>
+                                <Button size={'sm' as const}>View Details</Button>
                             </div>
                         </div>
                     </Card>

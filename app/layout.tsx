@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import ReactLenis from "lenis/react";
+import ReactLenis from 'lenis/react';
 
 export const metadata: Metadata = {
   title: "RaahSathi",

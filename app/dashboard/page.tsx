@@ -2,13 +2,25 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { CalendarDays, MapPin, Users2, Plane, List, Clock, Bell } from 'lucide-react'
+import { CalendarDays, MapPin, Users2, Plane, Clock, Bell } from 'lucide-react'
 import Link from 'next/link'
-import { useIsMobile } from '@/hooks/use-mobile'
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@clerk/nextjs';
+import { useEffect } from 'react';
 
 export default function Dashboard() {
-  const isMobile = useIsMobile()
+  const { userId } = useAuth();
+  const router = useRouter();
 
+  useEffect(() => {
+    if (!userId) {
+      router.push('/auth');
+    }
+  }, [userId, router]);
+
+  if (!userId) {
+    return null;
+  }
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-6">
       {/* Dashboard Header */}
@@ -18,7 +30,7 @@ export default function Dashboard() {
           <p className="text-muted-foreground">Track your adventures and plan new journeys</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" >
             <Bell className="h-4 w-4" />
           </Button>
           <Link href="/dashboard/trip">
@@ -85,9 +97,8 @@ export default function Dashboard() {
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium">{trip.title}</h3>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      trip.status === 'Confirmed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                    }`}>
+                    <span className={`text-xs px-2 py-1 rounded-full ${trip.status === 'Confirmed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
                       {trip.status}
                     </span>
                   </div>

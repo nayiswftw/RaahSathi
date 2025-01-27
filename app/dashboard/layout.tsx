@@ -1,11 +1,10 @@
 'use client'
 import { Button } from '@/components/ui/button';
-import { SignedIn, SignedOut, UserButton, UserProfile } from '@clerk/nextjs';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { Menu, Home, Map, Hotel, Utensils, Landmark, Save, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@clerk/nextjs';
+
 
 const menuItems = [
     { icon: Home, label: 'Explore', path: '/dashboard/explore' },
@@ -18,19 +17,6 @@ const menuItems = [
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-
-    const { userId } = useAuth();
-    const router = useRouter();
-    
-    React.useEffect(() => {
-      if (!userId) {
-        router.push('/auth');
-      }
-    }, [userId, router]);
-  
-    if (!userId) {
-      return null;
-    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -71,7 +57,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
                         </SignedIn>
                         <SignedOut>
                             <Link href={'/auth'}>
-                                <Button className='px-12' size={'lg'} >Sign In</Button>
+                                <Button className='px-12' size="lg" >Sign In</Button>
                             </Link>
                         </SignedOut>
                     </footer>
