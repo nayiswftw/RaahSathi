@@ -1,6 +1,6 @@
 'use client'
 
-import { SignIn, useAuth } from "@clerk/clerk-react";
+import { SignIn } from "@clerk/clerk-react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
@@ -36,8 +36,3 @@ const AuthModal = () => {
 };
 
 export default AuthModal;
-
-export const isUserLoggedIn = () => {
-  const auth = useAuth();
-  return !!auth.userId;
-};
