@@ -18,8 +18,8 @@ const AuthModal = () => {
             </p>
           </header>
 
-          <SignIn withSignUp fallbackRedirectUrl={'/dashboard'} afterSignOutUrl={'/'} signUpFallbackRedirectUrl={'/dashboard'}/>
-
+          <SignIn withSignUp afterSignOutUrl={'/'}/>
+          
           <Button
             onClick={() => navigate('/')}
             variant={'ghost'}
