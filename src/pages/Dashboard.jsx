@@ -9,7 +9,7 @@ import { useAuth, useUser } from '@clerk/clerk-react';
 import { SparklesText } from '@/components/ui/sparkles-text';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getTrips } from '@/lib/supabaseRequests'; // Import your data fetching function
+import { getTrips } from '@/lib/supabaseRequests';
 
 const Dashboard = () => {
     const location = useLocation();

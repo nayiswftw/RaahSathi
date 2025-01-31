@@ -40,7 +40,7 @@ export default function Navbar() {
                             <Button variant="ghost" className="hover:bg-accent"  onClick={() => window.location.href = '#how-it-works'} >
                                 How It Works
                             </Button>
-                            <Link to={'/dashboard/explore'}>
+                            <Link to={'/dashboard/saves'}>
                             <Button variant="ghost" className="hover:bg-accent">
                                 Saved Trips
                             </Button>
