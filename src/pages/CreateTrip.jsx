@@ -23,9 +23,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 import { MultiStepLoader } from '@/components/ui/multi-step-loader'
+import { AI_PROMPT, chatSession } from '@/lib/gemini'
 
 // Utils and constants
-import { chatSession, AI_PROMPT } from '../lib/gemini.js'
 
 const BUDGETS = [
     { title: 'Budget', desc: 'Travel Economically', value: 'Budget' },
