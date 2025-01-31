@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client'
-import { StrictMode, lazy, Suspense } from 'react'
+import { StrictMode, Suspense } from 'react'
 import './index.css'
 import App from './App.jsx'
 import { ClerkProvider } from '@clerk/clerk-react'
@@ -7,10 +7,9 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import { Skeleton } from "@/components/ui/skeleton"
 import AuthModal from './auth/AuthModal'
 import CreateTrip from './pages/CreateTrip'
-
-const ExplorePage = lazy(() => import('./pages/ExplorePage'))
-const SavedTripPage = lazy(() => import('./pages/SavedTripPage'))
-const Dashboard = lazy(() => import('./pages/Dashboard'))
+import ExplorePage from './pages/ExplorePage'
+import SavedTripPage from './pages/SavedTripPage'
+import Dashboard from './pages/Dashboard'
 
 const LoadingSkeleton = () => (
   <div className="flex h-screen w-full flex-col md:flex-row">
