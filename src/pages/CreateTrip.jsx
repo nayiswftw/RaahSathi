@@ -1,266 +1,260 @@
-import { useState, useEffect, memo } from 'react'
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
-import Autoplay from "embla-carousel-autoplay"
-import { Input } from '@/components/ui/input'
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEffect, useState, useCallback } from 'react'
+
+// External libraries
+import { Minus, Plus } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+
+// Components
+import CountrySelect from '@/components/country-select'
+import RegionSelect from '@/components/region-select'
+import TripData from '@/components/TripData'
 import { Button } from '@/components/ui/button'
-import { toast } from '@/hooks/use-toast'
-import TripData from './TripData'
-import { chatSession } from '@/lib/Gemini'
-import { AI_PROMPT } from '@/lib/Constants'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
-import { auth, db } from '@/lib/firebaseConfig'
-import { signOut } from 'firebase/auth'
-import { Link } from 'react-router'
-import { Loader2 } from 'lucide-react'
-import { useNavigate } from 'react-router'
+import { Card } from '@/components/ui/card'
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger
+} from '@/components/ui/drawer'
+import { Input } from '@/components/ui/input'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
+import { MultiStepLoader } from '@/components/ui/multi-step-loader'
 
-const SelectionCard = memo(({ option, type, value, onClick, description }) => (
-    <Card
-        className={`rounded-lg shadow-md cursor-pointer transition-transform hover:scale-105 
-      ${value === option ? 'bg-[#2b253b] text-white' : 'bg-white text-gray-700'}`}
-        onClick={() => onClick(option)}
-    >
-        <CardHeader>
-            <CardTitle className="text-base md:text-lg">{option}</CardTitle>
-            <CardDescription className="text-sm">{description}</CardDescription>
-        </CardHeader>
+// Utils and constants
+import { AI_PROMPT } from '@/lib/constants'
+import { chatSession } from '@/lib/gemini'
+
+const BUDGETS = [
+    { title: 'Budget', desc: 'Travel Economically', value: 'Budget' },
+    { title: 'Moderate', desc: 'Enjoy balanced luxury.', value: 'Moderate' },
+    { title: 'Luxury', desc: 'Indulge in premium experiences', value: 'Luxury' }
+]
+
+const TRIPTYPE = [
+    { title: 'Solo', desc: 'Your personal escape.', value: '1' },
+    { title: 'Family', desc: 'Perfect for family trips.', value: '3' },
+    { title: 'Friends', desc: 'Fun and adventure guaranteed.', value: '5' }
+]
+
+const loadingStates = [
+    { text: 'Analyzing your preferences' },
+    { text: 'Generating your itinerary' },
+    { text: 'Finalizing your trip' }
+]
+
+const SelectionCard = ({ item, name, onChange }) => (
+    <Card className='p-5 hover:scale-[1.02] hover:shadow-lg hover:border-primary/50 cursor-pointer transition-all duration-300'>
+        <Label className='flex items-center gap-4 cursor-pointer'>
+            <Input
+                type='radio'
+                name={name}
+                onChange={() => onChange(item.value)}
+                className='w-5 h-5 accent-primary'
+            />
+            <div>
+                <h3 className='font-semibold text-lg'>{item.title}</h3>
+                <p className='text-sm text-muted-foreground'>{item.desc}</p>
+            </div>
+        </Label>
     </Card>
-));
-
-const ImageCarousel = memo(() => (
-    <Carousel plugins={[Autoplay({ delay: 3000 })]} className='w-full md:w-1/2 flex'>
-        <CarouselContent className='h-full'>
-            {['/getStarted.jpg', '/02.jpg', '/03.gif'].map((src, i) => (
-                <CarouselItem key={i}>
-                    <img src={src} className='object-cover w-full h-full md:rounded-s-3xl' />
-                </CarouselItem>
-            ))}
-        </CarouselContent>
-    </Carousel>
-));
+);
 
 function CreateTrip() {
     const [formData, setFormData] = useState({
-        destination: '',
-        duration: '',
-        companion: '',
-        budget: ''
+        destination: "",
+        duration: 1,
+        budget: '',
+        companion: ''
     });
     const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const navigate = useNavigate();
+    const { destination, duration, budget, companion } = formData;
 
     useEffect(() => {
-        // Auth state listener
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-            if (user) {
-                setIsAuthenticated(true);
-                fetchTripData(user.uid);
-            } else {
-                setIsAuthenticated(false);
-                setData(null);
-            }
-        });
+        setFormData((prev) => ({ ...prev, duration, destination }));
+    }, [duration, destination]);
 
-        // Cleanup subscription
-        return () => unsubscribe();
-
+    const onClick = useCallback((adjustment) => {
+        setFormData((prev) => ({ ...prev, duration: prev.duration + adjustment }));
     }, []);
 
-    const handleInputChange = (field) => (e) => {
-        setFormData(prev => ({ ...prev, [field]: e.target.value }));
-    };
+    const isFormValid = useCallback(() => {
+        return destination && duration && budget && companion;
+    }, [destination, duration, budget, companion]);
 
-    const handleSubmit = async () => {
-        if (Object.values(formData).some(v => !v)) {
-            toast({
-                title: "Please complete all fields before proceeding!",
-                variant: 'destructive',
-            });
+    const handleBudgetChange = useCallback((value) => setFormData((prev) => ({ ...prev, budget: value })), []);
+    const handleTripTypeChange = useCallback((value) => setFormData((prev) => ({ ...prev, companion: value })), []);
+
+    const generateTrip = useCallback(async () => {
+        if (!isFormValid()) {
+            console.log('Please fill in all fields');
             return;
         }
 
         try {
-            setLoading(true);
-
+            setIsLoading(true);
             const FINAL_PROMPT = AI_PROMPT
-                .replace('{destination}', formData.destination)
-                .replace('{days}', formData.duration)
-                .replace('{companions}', formData.companion)
-                .replace('{budget}', formData.budget);
+                .replace('{destination}', destination)
+                .replace('{days}', duration)
+                .replace('{companions}', companion)
+                .replace('{budget}', budget);
 
             const result = await chatSession.sendMessage(FINAL_PROMPT);
-            const docId = Date.now().toString();
-            const newData = {
-                config: formData,
-                data: JSON.parse(result.response.text()),
-                userID: auth.currentUser.uid,
+            const responseText = await result.response.text();
 
-            };
+            try {
+                const parsedData = JSON.parse(responseText);
+                setData({
+                    config: formData,
+                    data: parsedData,
+                    userID: result.userID,
+                    date: new Date().toDateString() 
+                });
 
-            await setDoc(doc(db, "TripData", docId), newData);
-            setData(newData);
-        } catch (error) {
-            console.error("Error creating trip:", error);
-            toast({
-                title: "Error creating trip. Please try again.",
-                variant: 'destructive',
-            });
-        }
-        setLoading(false);
-    };
-
-    const fetchTripData = async (userId) => {
-        try {
-            const docSnap = await getDoc(doc(db, 'TripData', userId));
-            if (docSnap.exists()) {
-                setData(docSnap.data());
+                // console.log('Trip data:', parsedData);
+            } catch (e) {
+                throw new Error('Invalid response format');
             }
         } catch (error) {
-            console.error("Error fetching trip:", error);
-            toast({
-                title: "Error fetching trip data",
-                description: "Please try refreshing the page",
-                variant: "destructive"
-            });
+            console.error('Trip generation error:', error);
+        } finally {
+            setIsLoading(false);
         }
-    };
-    // const myTrips = async () => {
-    //     const docSnaps = await getDocs(collection(db, 'TripData'));
-    //     const userTrips = docSnaps.docs
-    //         .filter(doc => doc.data().userID === auth.currentUser.uid)
-    //         .map(doc => doc.data());
-    //     setData(userTrips);
-    // };
-
-
-    const handleLogout = async () => {
-        try {
-            await signOut(auth);
-            toast({
-                title: "Logged out successfully",
-
-            });
-            navigate('/auth');
-        } catch (error) {
-            console.error("Error logging out:", error);
-            toast({
-                title: "Error logging out. Please try again.",
-                variant: 'destructive',
-            });
-        }
-
-    };
-
+    }, [isFormValid, destination, duration, companion, budget, formData]);
 
     return (
         <>
-            <div className='relative min-h-screen overflow-hidden'>
-                <video className='absolute object-cover w-full h-full' src="/preloader.mp4" muted autoPlay loop />
-                <div className='flex flex-col md:flex-row min-h-screen p-2 md:p-5 relative z-10'>
-                    <Link to='/'>
-                        <Button size='lg' className='fixed rounded-full bg-transparent text-white z-20 m-2 md:m-5' variant='ghost'>
-                            &#8592; Go back
-                        </Button>
-                    </Link>
-
-                    {isAuthenticated && (
-                        <>
-                            <Link to='/my-trips'>
-                                <Button
-                                    size='lg'
-                                    className='fixed transform right-40 rounded-full text-white z-20 m-2 md:m-5'
-                                    variant='ghost'
-                                >
-                                    My Trips
-                                </Button>
-                            </Link>
-                            <Button
-                                size='lg'
-                                className='fixed right-2 md:right-5 rounded-full text-white z-20 m-2 md:m-5'
-                                variant='ghost'
-                                onClick={handleLogout}
-                            >
-                                Logout
-                            </Button>
-                        </>
-                    )}
-
-                    <ImageCarousel />
-
-                    <div className="w-full md:w-1/2 bg-[#7879a7]/80 md:rounded-e-3xl shadow-lg p-4 md:p-8 space-y-4 md:space-y-6 mt-4 md:mt-0 overflow-auto">
-                        <h1 className="text-white font-bold text-xl md:text-2xl">Let's begin your journey!</h1>
-
-                        {[
-                            { label: 'Where do you want to go?', field: 'destination', type: 'text', placeholder: 'Enter your destination' },
-                            { label: 'For how long?', field: 'duration', type: 'number', placeholder: 'e.g., 3 days' }
-                        ].map(({ label, field, type, placeholder }) => (
-                            <div key={field} className="space-y-2 md:space-y-3">
-                                <label className="block text-white text-base md:text-lg font-semibold">{label}</label>
-                                <Input
-                                    type={type}
-                                    placeholder={placeholder}
-                                    className="w-full rounded-lg p-2 md:p-3 text-gray-700"
-                                    value={formData[field]}
-                                    onChange={handleInputChange(field)}
-                                />
+            {isFormValid() &&
+                <MultiStepLoader loop={false} loading={isLoading} loadingStates={loadingStates} />
+            }
+            <div className="h-screen">
+                <div className='w-full h-full flex flex-col md:flex-row rounded-3xl backdrop-blur-md transition-all'>
+                    <div className='w-full md:w-1/2 relative overflow-y-scroll'>
+                        <div className='container mx-auto p-6 md:p-12'>
+                            <div className="space-y-4 mb-10">
+                                <h1 className='font-bold text-4xl tracking-tight'>
+                                    Plan Your Dream Trip
+                                </h1>
+                                <p className='text-muted-foreground'>Fill in the details below to create your perfect itinerary</p>
                             </div>
-                        ))}
 
-                        <div className="space-y-2 md:space-y-3">
-                            <label className="block text-white text-base md:text-lg font-semibold">Who are you traveling with?</label>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-4">
-                                {[
-                                    ['Family', 'Perfect for family trips.'],
-                                    ['Friends', 'Fun and adventure guaranteed.'],
-                                    ['Solo', 'Your personal escape.']
-                                ].map(([option, desc]) => (
-                                    <SelectionCard
-                                        key={option}
-                                        option={option}
-                                        value={formData.companion}
-                                        onClick={(val) => setFormData(prev => ({ ...prev, companion: val }))}
-                                        description={desc}
-                                    />
-                                ))}
+                            <div className='space-y-10'>
+                                <div className='space-y-3 '>
+                                    <Label className="text-base font-semibold inline-block">
+                                        Destination
+                                    </Label>
+                                    <div className='flex items-center space-x-4'>
+                                        <CountrySelect
+                                            className="w-1/2"
+                                            onChange={(value) => setFormData((prev) => ({ ...prev, countryCode: value }))} 
+                                            placeholder="Country"
+                                            priorityOptions={['IN']}
+                                        />
+                                        <RegionSelect
+                                            onChange={(value) => setFormData((prev) => ({ ...prev, destination: value }))}
+                                            className="w-1/2"
+                                            countryCode={formData.countryCode}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className='space-y-3'>
+                                    <Label className="text-base font-semibold block">
+                                        Duration
+                                    </Label>
+                                    <Drawer>
+                                        <DrawerTrigger asChild>
+                                            <Button size={'lg'} className='w-full text-md p-5'>Select Days</Button>
+                                        </DrawerTrigger>
+                                        <DrawerContent>
+                                            <div className="mx-auto w-full max-w-sm">
+                                                <DrawerHeader>
+                                                    <DrawerTitle>Adjust Days</DrawerTitle>
+                                                    <DrawerDescription>Set your trip duration.</DrawerDescription>
+                                                </DrawerHeader>
+                                                <div className="p-4 pb-0">
+                                                    <div className="flex items-center justify-center space-x-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="h-8 w-8 shrink-0 rounded-full"
+                                                            onClick={() => onClick(-1)}
+                                                            disabled={duration <= 1}
+                                                        >
+                                                            <Minus />
+                                                            <span className="sr-only">Decrease</span>
+                                                        </Button>
+                                                        <div className="flex-1 text-center">
+                                                            <div className="text-7xl font-bold tracking-tighter">
+                                                                {duration}
+                                                            </div>
+                                                        </div>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="h-8 w-8 shrink-0 rounded-full"
+                                                            onClick={() => onClick(1)}
+                                                            disabled={duration >= 7}
+                                                        >
+                                                            <Plus />
+                                                            <span className="sr-only">Increase</span>
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                                <DrawerFooter>
+                                                    <DrawerClose asChild>
+                                                        <Button>Submit</Button>
+                                                    </DrawerClose>
+                                                    <DrawerClose asChild>
+                                                        <Button variant="outline">Cancel</Button>
+                                                    </DrawerClose>
+                                                </DrawerFooter>
+                                            </div>
+                                        </DrawerContent>
+                                    </Drawer>
+                                </div>
+
+                                <div className='space-y-4'>
+                                    <Label className="text-base font-semibold block">Budget Range</Label>
+                                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+                                        {BUDGETS.map((budget) => (
+                                            <SelectionCard key={budget.value} item={budget} name='budget' onChange={handleBudgetChange} />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className='space-y-4'>
+                                    <Label className="text-base font-semibold block">Travel With</Label>
+                                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+                                        {TRIPTYPE.map((type) => (
+                                            <SelectionCard key={type.value} item={type} name='tripType' onChange={handleTripTypeChange} />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <InteractiveHoverButton
+                                    onClick={generateTrip}
+                                    className="w-full py-4 text-lg font-semibold rounded-xl"
+                                >
+                                    Create My Itinerary
+                                </InteractiveHoverButton>
                             </div>
                         </div>
-
-                        <div className="space-y-2 md:space-y-3">
-                            <label className="block text-white text-base md:text-lg font-semibold">How much is your budget?</label>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-4">
-                                {[
-                                    ['Budget', 'Travel economically.'],
-                                    ['Moderate', 'Enjoy balanced luxury.'],
-                                    ['Luxury', 'Indulge in premium experiences.']
-                                ].map(([option, desc]) => (
-                                    <SelectionCard
-                                        key={option}
-                                        option={option}
-                                        value={formData.budget}
-                                        onClick={(val) => setFormData(prev => ({ ...prev, budget: val }))}
-                                        description={desc}
-                                    />
-                                ))}
-                            </div>
-                            <div className='flex justify-center mt-4'>
-                                <Button
-                                    size='md'
-                                    variant='secondary'
-                                    className='rounded-full w-full text-sm md:text-base'
-                                    onClick={handleSubmit}
-                                >
-                                    {loading ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <>Create Trip &rarr;</>
-                                    )}
-                                </Button>
-                            </div>
-                        </div>
+                    </div>
+                    <div className='hidden md:block w-full md:w-1/2 relative'>
+                        <video
+                            className='absolute object-cover w-full h-full opacity-90'
+                            src="/preloader.mp4"
+                            muted
+                            autoPlay
+                            loop
+                            loading="lazy"
+                        />
                     </div>
                 </div>
             </div>

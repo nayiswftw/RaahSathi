@@ -1,31 +1,3 @@
-export const features = [
-    {   
-        title: "Hotels",
-        text: "Stay at the best hotels around the world for the best prices.",
-    },
-    {
-        title: "Itineraries",
-        text: "Plan your trip with detailed itineraries and travel guides.",
-    },
-    {
-        title: "Weather",
-        text: "Get accurate weather forecasts for your travel dates.",
-    },
-    {
-        title: "Restaurants",
-        text: "Snag a coveted table at the hottest restaurants.",
-    },
-    {
-        title: "Budget",
-        text: "Manage your travel budget with detailed cost breakdowns.",
-    },
-    {
-        title: "Tours",
-        text: "Get an insider’s perspective on any location or attraction.",
-    },
-];
-
-
 export const AI_PROMPT=`
 Please generate a strict JSON response for a trip to the {destination} for {days} days with a {companions} and a budget of {budget} USD. The output should include the following sections: 
 1. Hotel Options: Provide 3-5 hotels with 'hotelName', 'hotelAddress', 'pricePerNight', and 'rating'.

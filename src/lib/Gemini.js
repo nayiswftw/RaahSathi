@@ -1,10 +1,13 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const apiKey = import.meta.env.VITE_GOOGLE_GEMINI_AI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey);
+
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+if (!apiKey) throw new Error('VITE_GEMINI_API_KEY is not defined');
+
+const genAI = new GoogleGenerativeAI(`${apiKey}`);
 
 const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro",
+    model: "gemini-1.5-flash",
     systemInstruction: "You are a professional and detail-oriented AI Travel Assistant. Your task is to create a personalized trip plan based on the provided input variables. Your response must adhere strictly to JSON format and should include the following details:",
 });
 
@@ -33,7 +36,3 @@ export const chatSession = model.startChat({
         },
     ],
 });
-
-// const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
-// console.log(result.response.text());
-
