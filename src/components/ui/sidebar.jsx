@@ -1,6 +1,6 @@
-
+"use client";;
 import { cn } from "@/lib/utils";
-import { useState, createContext, useContext } from "react";
+import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import { Link } from "react-router";
@@ -64,7 +64,7 @@ export const DesktopSidebar = ({
   return (<>
     <motion.div
       className={cn(
-        "h-screen overflow-hidden overflow-y-auto sticky top-0 px-4 py-4 hidden md:flex md:flex-col bg-neutral-100/50 dark:bg-neutral-800/80 w-[300px] flex-shrink-0 backdrop-blur-xl border-r border-neutral-200 dark:border-neutral-700",
+        "h-full px-4 py-4 hidden  md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
         className
       )}
       animate={{
@@ -82,11 +82,8 @@ export const DesktopSidebar = ({
             userButtonTrigger: "hover:opacity-80 transition-opacity",
             userButtonBox: { flexDirection: "row-reverse" }
           }
-        }}
-        
-      />
+        }}/>
     </motion.div>
-
   </>);
 };
 
@@ -99,7 +96,7 @@ export const MobileSidebar = ({
   return (<>
     <div
       className={cn(
-        "h-16 px-4 flex flex-row md:hidden items-center bg-white dark:bg-neutral-900 w-full border-b border-neutral-200 dark:border-neutral-800 fixed top-0 left-0 z-40 shadow-sm"
+        "h-14 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-black w-full"
       )}
       {...props}>
       <div className="flex justify-between items-center z-20 w-full ">
@@ -127,18 +124,15 @@ export const MobileSidebar = ({
               ease: "easeInOut",
             }}
             className={cn(
-              "fixed h-[100dvh] w-full inset-0 bg-white dark:bg-neutral-900 px-6 py-8 z-[100] flex flex-col",
+              "fixed h-full w-full inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm p-10 z-[100] flex flex-col justify-between",
               className
             )}>
             <div
-              className="absolute right-4 top-4 z-50 p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+              className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
               onClick={() => setOpen(!open)}>
-              <IconX className="w-6 h-6 text-neutral-800 dark:text-neutral-200" />
+              <IconX />
             </div>
-            <div className="overflow-y-auto flex-1 mt-8">
-              {children}
-              
-            </div>
+            {children}
           </motion.div>
         )}
       </AnimatePresence>
@@ -156,13 +150,12 @@ export const SidebarLink = ({
     (<Link
       to={link.href}
       className={cn("flex items-center justify-start gap-2  group/sidebar py-2", className)}
-      onClick={() => setOpen(false)}
       {...props}>
       {link.icon}
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
-
+          opacity: animate ? (open ? 1 : 0) : 1,
         }}
         className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0">
         {link.label}

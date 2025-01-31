@@ -19,10 +19,10 @@ createRoot(document.getElementById('root')).render(
           <Routes>
             <Route path="/auth" element={<AuthModal />} />
             <Route path="/" element={<App />} />
-            <Route path="/dashboard" element={<Dashboard />}>
-              <Route path="trip" element={<CreateTrip />} />
-              <Route path="explore" element={<ExplorePage />} />
-              <Route path="saves" element={<SavedTripPage />} />
+            <Route  path="/dashboard" element={<Dashboard />} >
+              <Route path="/dashboard/trip" element={<CreateTrip />} />
+              <Route path="/dashboard/explore" element={<ExplorePage />} />
+              <Route path="/dashboard/saves" element={<SavedTripPage />} />
             </Route>
           </Routes>
       </BrowserRouter>
