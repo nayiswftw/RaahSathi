@@ -26,7 +26,7 @@ import { MultiStepLoader } from '@/components/ui/multi-step-loader'
 
 // Utils and constants
 import { AI_PROMPT } from "@/lib/gemini"
-import { chatSession } from '@/lib/gemini'
+import { chatSession } from '@/lib/gemini.js'
 
 const BUDGETS = [
     { title: 'Budget', desc: 'Travel Economically', value: 'Budget' },
