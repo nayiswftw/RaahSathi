@@ -25,7 +25,7 @@ import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button
 import { MultiStepLoader } from '@/components/ui/multi-step-loader'
 
 // Utils and constants
-import { AI_PROMPT } from '@/lib/constants'
+import { AI_PROMPT } from "@/lib/gemini"
 import { chatSession } from '@/lib/gemini'
 
 const BUDGETS = [
