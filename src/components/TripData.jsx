@@ -11,8 +11,8 @@ const NavButton = memo(({ section, label, isActive, setActiveSection }) => (
         className={`
             px-4 py-2 transition-all duration-300 
             ${isActive
-                ? 'text-white shadow-lg scale-105'
-                : 'bg-white/80 hover:bg-white hover:scale-105 text-gray-700'}
+                ? 'text-white shadow-lg scale-105 dark:bg-black'
+                : 'bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 hover:scale-105 text-gray-700 dark:text-gray-200'}
         `}
     >
         {label}
@@ -21,7 +21,7 @@ const NavButton = memo(({ section, label, isActive, setActiveSection }) => (
 
 const CardWrapper = memo(({ children }) => (
     <div
-        className=" bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100"
+        className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700"
     >
         {children}
     </div>
@@ -35,7 +35,7 @@ const ItinerarySection = memo(({ itineraryPlanner }) => (
                     <h3 className="text-lg md:text-xl font-bold mb-2">{day?.day}</h3>
                     <ul className="list-disc list-inside space-y-1 md:space-y-2">
                         {day?.activities?.map((activity, idx) => (
-                            <li key={idx} className="text-sm md:text-base text-gray-600">
+                            <li key={idx} className="text-sm md:text-base text-muted-foreground">
                                 {activity}
                             </li>
                         ))}
@@ -54,7 +54,7 @@ const HotelsSection = memo(({ hotelOptions }) => (
                     <img src={`https://picsum.photos/seed/${i}/600`} className="w-full h-40 md:h-48 object-cover rounded-t-xl" alt="Hotel" />
                     <div className="p-4 md:p-6">
                         <h3 className="text-lg md:text-xl font-bold mb-2">{hotel?.hotelName}</h3>
-                        <p className="flex items-center gap-2 text-sm md:text-base text-gray-600 mb-2">
+                        <p className="flex items-center gap-2 text-sm md:text-base text-muted-foreground mb-2">
                             <MapPin className="w-4 h-4" />
                             {hotel?.hotelAddress}
                         </p>
@@ -84,7 +84,7 @@ const WeatherSection = memo(({ weatherForecast }) => (
                     <div className="text-4xl md:text-6xl mb-4">
                         {day?.condition === 'Sunny' ? '☀️' : day?.condition === 'Rainy' ? '🌧️' : '⛅'}
                     </div>
-                    <p className="text-sm md:text-base text-gray-600">{day?.condition}</p>
+                    <p className="text-sm md:text-base text-muted-foreground">{day?.condition}</p>
                     <p className="text-xl md:text-2xl font-bold mt-2">{day?.temperature}</p>
                 </div>
             </CardWrapper>
@@ -101,7 +101,7 @@ const SpotsSection = memo(({ touristSpots }) => (
                         <img src={`https://picsum.photos/seed/${i}-${idx}/600`} className="w-full h-40 md:h-48 object-cover rounded-t-xl" alt="Attraction" />
                         <div className="p-4 md:p-6">
                             <h3 className="text-lg md:text-xl font-bold mb-2">{attraction?.name}</h3>
-                            <p className="text-sm md:text-base text-gray-600 mb-4">{attraction?.description}</p>
+                            <p className="text-sm md:text-base text-muted-foreground mb-4">{attraction?.description}</p>
                             <div className="flex items-center justify-between">
                                 <span className="flex items-center gap-1 text-sm md:text-base">
                                     <DollarSign className="w-4 h-4" />
@@ -129,7 +129,7 @@ const RestaurantsSection = memo(({ restaurantRecommendations }) => (
                         <img src={`https://picsum.photos/seed/${i}/600`} className="w-full h-40 md:h-48 object-cover rounded-t-xl" alt="Restaurant" />
                         <div className="p-4 md:p-6">
                             <h3 className="text-lg md:text-xl font-bold mb-2">{restaurant?.name}</h3>
-                            <p className="text-sm md:text-base text-gray-600 mb-2">Cuisine: {restaurant?.cuisine}</p>
+                            <p className="text-sm md:text-base text-muted-foreground mb-2">Cuisine: {restaurant?.cuisine}</p>
                             <div className="flex items-center justify-between">
                                 <span className="flex items-center gap-1 text-sm md:text-base">
                                     <DollarSign className="w-4 h-4" />
@@ -153,7 +153,7 @@ const BudgetSection = memo(({ budgetOverview }) => (
         <div className="p-4 md:p-8">
             <div className="flex items-center gap-2 mb-4 md:mb-6">
                 <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-                <h3 className="text-xl md:text-2xl font-bold text-gray-800">Budget Overview</h3>
+                <h3 className="text-xl md:text-2xl font-bold">Budget Overview</h3>
             </div>
             <div className="space-y-3 md:space-y-4">
                 {[
@@ -163,8 +163,8 @@ const BudgetSection = memo(({ budgetOverview }) => (
                     { label: 'Total Hotel Cost', value: budgetOverview?.totalHotelCost }
                 ].map(item => (
                     <div key={item.label} className="flex items-center justify-between p-2 md:p-3 rounded-lg hover:bg-gray-50">
-                        <span className="text-sm md:text-base text-gray-600">{item.label}</span>
-                        <div className="flex items-center gap-1 text-base md:text-lg font-semibold text-gray-900">
+                        <span className="text-sm md:text-base text-muted-foreground">{item.label}</span>
+                        <div className="flex items-center gap-1 text-base md:text-lg font-semibold text-muted-foreground">
                             <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
                             {isNaN(Number(item.value)) ? 'N/A' : item.value}
                         </div>
@@ -216,7 +216,7 @@ export const HeaderSection = memo(({ config, onSave }) => {
             </div>
             <div className="absolute top-4 md:top-8 right-4 md:right-8 flex gap-2">
                 {onSave && (
-                    <Button onClick={handleSave} className="px-4 py-2 text-white flex items-center gap-2">
+                    <Button onClick={handleSave} className="px-4 py-2 flex items-center gap-2">
                         {isSaved ? (
                             <HeartIcon className="w-4 h-4 text-red-500" />
                         ) : (
