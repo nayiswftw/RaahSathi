@@ -69,9 +69,9 @@ const Dashboard = () => {
 
     const links = useMemo(() => [
         { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboardIcon /> },
-        { href: '/dashboard/explore', label: 'Explore', icon: <CompassIcon /> },
-        { href: '/dashboard/trip', label: 'Create Trip', icon: <PlaneIcon /> },
-        { href: '/dashboard/saves', label: 'Saved', icon: <SaveIcon /> },
+        { href: 'explore', label: 'Explore', icon: <CompassIcon /> },
+        { href: 'trip', label: 'Create Trip', icon: <PlaneIcon /> },
+        { href: 'saves', label: 'Saved', icon: <SaveIcon /> },
     ], []);
 
     return (
