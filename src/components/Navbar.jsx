@@ -19,7 +19,7 @@ export default function Navbar() {
     const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light')
 
     return (
-        <nav className='sticky top-0 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 shadow-sm z-50 transition-all duration-200'>
+        <nav className='top-0 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 shadow-sm z-50 transition-all duration-200'>
             <div className='container max-w-7xl mx-auto px-4 lg:px-8 py-4'>
                 <div className='flex items-center justify-between'>
                     {/* Logo */}

@@ -1,9 +1,10 @@
 import { createRoot } from 'react-dom/client'
 import { StrictMode } from 'react'
+import { ReactLenis } from 'lenis/react'
+import { BrowserRouter, Route, Routes } from 'react-router'
+import { ClerkProvider } from '@clerk/clerk-react'
 import './index.css'
 import App from './App.jsx'
-import { ClerkProvider } from '@clerk/clerk-react'
-import { BrowserRouter, Route, Routes } from 'react-router'
 import AuthModal from './auth/AuthModal'
 import CreateTrip from './pages/CreateTrip'
 import ExplorePage from './pages/ExplorePage'
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl='/'>
       <BrowserRouter>
+      <ReactLenis root>
           <Routes>
             <Route path="/auth" element={<AuthModal />} />
             <Route path="/" element={<App />} />
@@ -25,6 +27,7 @@ createRoot(document.getElementById('root')).render(
               <Route path="/dashboard/saves" element={<SavedTripPage />} />
             </Route>
           </Routes>
+      </ReactLenis>
       </BrowserRouter>
     </ClerkProvider>
   </StrictMode>
