@@ -36,7 +36,7 @@ Check out the [Live Demo](https://raahsathi.vercel.app/)
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/RaahSathi.git
+git clone https://github.com/nayiswftw/RaahSathi.git
 cd RaahSathi
 ```
 
