@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { addTrips } from '@/lib/supabaseRequests';
 import { Link } from 'react-router';
 import { useAuth } from '@clerk/clerk-react';
+import { fetchHotels, fetchRestaurants, fetchSpots } from '@/hooks/getDummyImages';
+
+
 
 const NavButton = memo(({ section, label, isActive, setActiveSection }) => (
     <Button
@@ -46,34 +49,55 @@ const ItinerarySection = memo(({ itineraryPlanner }) => (
     </>
 ));
 
-const HotelsSection = memo(({ hotelOptions }) => (
-    <>
-        {hotelOptions?.map((hotel, i) => (
-            <CardWrapper key={i}>
-                <Link to={`https://www.google.com/maps/search/${hotel?.hotelName},${hotel?.hotelAddress}`} target="_blank">
-                    <img src={`https://picsum.photos/seed/${i}/600`} className="w-full h-40 md:h-48 object-cover rounded-t-xl" alt="Hotel" />
-                    <div className="p-4 md:p-6">
-                        <h3 className="text-lg md:text-xl font-bold mb-2">{hotel?.hotelName}</h3>
-                        <p className="flex items-center gap-2 text-sm md:text-base text-muted-foreground mb-2">
-                            <MapPin className="w-4 h-4" />
-                            {hotel?.hotelAddress}
-                        </p>
-                        <div className="flex items-center justify-between mt-4">
-                            <span className="flex items-center gap-1 text-sm md:text-base">
-                                <DollarSign className="w-4 h-4" />
-                                {hotel?.pricePerNight}
-                            </span>
-                            <span className="flex items-center gap-1 text-yellow-500">
-                                <Star className="w-4 h-4 fill-current" />
-                                {hotel?.rating}
-                            </span>
+const HotelsSection = memo(({ hotelOptions }) => {
+    const [hotelImages, setHotelImages] = useState([]);
+
+    useEffect(() => {
+        const loadImages = async () => {
+            const images = await Promise.all(
+                hotelOptions?.map(async () => await fetchHotels())
+            );
+            setHotelImages(images);
+        };
+
+        loadImages();
+    }, [hotelOptions]);
+
+    return (
+        <>
+            {hotelOptions?.map((hotel, i) => (
+                <CardWrapper key={i}>
+                    <Link to={`https://www.google.com/maps/search/${hotel?.hotelName},${hotel?.hotelAddress}`} target="_blank">
+                        <img
+                            key={i}
+                            src={hotelImages[i] || ''}
+                            className="w-full h-40 md:h-48 object-cover rounded-t-xl"
+                            alt="Hotel"
+                            loading='lazy'
+                        />
+                        <div className="p-4 md:p-6">
+                            <h3 className="text-lg md:text-xl font-bold mb-2">{hotel?.hotelName}</h3>
+                            <p className="flex items-center gap-2 text-sm md:text-base text-muted-foreground mb-2">
+                                <MapPin className="w-4 h-4" />
+                                {hotel?.hotelAddress}
+                            </p>
+                            <div className="flex items-center justify-between mt-4">
+                                <span className="flex items-center gap-1 text-sm md:text-base">
+                                    <DollarSign className="w-4 h-4" />
+                                    {hotel?.pricePerNight}
+                                </span>
+                                <span className="flex items-center gap-1 text-yellow-500">
+                                    <Star className="w-4 h-4 fill-current" />
+                                    {hotel?.rating}
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                </Link>
-            </CardWrapper>
-        ))}
-    </>
-));
+                    </Link>
+                </CardWrapper>
+            ))}
+        </>
+    );
+});
 
 const WeatherSection = memo(({ weatherForecast }) => (
     <>
@@ -92,61 +116,115 @@ const WeatherSection = memo(({ weatherForecast }) => (
     </>
 ));
 
-const SpotsSection = memo(({ touristSpots }) => (
-    <>
-        {touristSpots?.flatMap((day, i) =>
-            day?.attractions?.map((attraction, idx) => (
-                <CardWrapper key={`${i}-${idx}`}>
-                    <Link to={`https://www.google.com/maps/search/${attraction?.name}`} target="_blank">
-                        <img src={`https://picsum.photos/seed/${i}-${idx}/600`} className="w-full h-40 md:h-48 object-cover rounded-t-xl" alt="Attraction" />
-                        <div className="p-4 md:p-6">
-                            <h3 className="text-lg md:text-xl font-bold mb-2">{attraction?.name}</h3>
-                            <p className="text-sm md:text-base text-muted-foreground mb-4">{attraction?.description}</p>
-                            <div className="flex items-center justify-between">
-                                <span className="flex items-center gap-1 text-sm md:text-base">
-                                    <DollarSign className="w-4 h-4" />
-                                    {attraction?.estimatedCost}
-                                </span>
-                                <span className="flex items-center gap-1 text-yellow-500">
-                                    <Star className="w-4 h-4 fill-current" />
-                                    {attraction?.rating}
-                                </span>
-                            </div>
-                        </div>
-                    </Link>
-                </CardWrapper>
-            ))
-        )}
-    </>
-));
+const SpotsSection = memo(({ touristSpots }) => {
 
-const RestaurantsSection = memo(({ restaurantRecommendations }) => (
-    <>
-        {restaurantRecommendations?.flatMap((day, i) =>
-            day?.restaurants?.map((restaurant, idx) => (
-                <CardWrapper key={`${i}-${idx}`}>
-                    <Link to={`https://www.google.com/maps/search/${restaurant?.name}`} target="_blank">
-                        <img src={`https://picsum.photos/seed/${i}/600`} className="w-full h-40 md:h-48 object-cover rounded-t-xl" alt="Restaurant" />
-                        <div className="p-4 md:p-6">
-                            <h3 className="text-lg md:text-xl font-bold mb-2">{restaurant?.name}</h3>
-                            <p className="text-sm md:text-base text-muted-foreground mb-2">Cuisine: {restaurant?.cuisine}</p>
-                            <div className="flex items-center justify-between">
-                                <span className="flex items-center gap-1 text-sm md:text-base">
-                                    <DollarSign className="w-4 h-4" />
-                                    {restaurant?.cost}
-                                </span>
-                                <span className="flex items-center gap-1 text-yellow-500">
-                                    <Star className="w-4 h-4 fill-current" />
-                                    {restaurant?.rating}
-                                </span>
-                            </div>
-                        </div>
-                    </Link>
-                </CardWrapper>
-            ))
-        )}
-    </>
-));
+    
+    const [spotImages, setSpotImages] = useState([]);
+
+    useEffect(() => {
+        const loadImages = async () => {
+            const images = await Promise.all(
+                touristSpots?.flatMap(day => 
+                    day?.attractions?.map(async () => await fetchSpots())
+                ) || []
+            );
+            setSpotImages(images);
+        };
+
+        loadImages();
+    }, [touristSpots]);
+
+    return (
+        <>
+            {touristSpots?.flatMap((day, i) =>
+                day?.attractions?.map((attraction, idx) => {
+                    const imageIndex = i * (day?.attractions?.length || 0) + idx;
+                    return (
+                        <CardWrapper key={`${i}-${idx}`}>
+                            <Link to={`https://www.google.com/maps/search/${attraction?.name}`} target="_blank">
+                                <img 
+                                    key={idx} 
+                                    src={spotImages[imageIndex] || ''} 
+                                    className="w-full h-40 md:h-48 object-cover rounded-t-xl" 
+                                    alt="Attraction" 
+                                    loading='lazy' 
+                                />
+                                <div className="p-4 md:p-6">
+                                    <h3 className="text-lg md:text-xl font-bold mb-2">{attraction?.name}</h3>
+                                    <p className="text-sm md:text-base text-muted-foreground mb-4">{attraction?.description}</p>
+                                    <div className="flex items-center justify-between">
+                                        <span className="flex items-center gap-1 text-sm md:text-base">
+                                            <DollarSign className="w-4 h-4" />
+                                            {attraction?.estimatedCost}
+                                        </span>
+                                        <span className="flex items-center gap-1 text-yellow-500">
+                                            <Star className="w-4 h-4 fill-current" />
+                                            {attraction?.rating}
+                                        </span>
+                                    </div>
+                                </div>
+                            </Link>
+                        </CardWrapper>
+                    );
+                })
+            )}
+        </>
+    )
+});
+
+const RestaurantsSection = memo(({ restaurantRecommendations }) => {
+    const [restaurantImages, setRestaurantImages] = useState([]);
+
+    useEffect(() => {
+        const loadImages = async () => {
+            const images = await Promise.all(
+                restaurantRecommendations?.flatMap(day => 
+                    day?.restaurants?.map(async () => await fetchRestaurants())
+                ) || []
+            );
+            setRestaurantImages(images);
+        };
+
+        loadImages();
+    }, [restaurantRecommendations]);
+
+    return (
+        <>
+            {restaurantRecommendations?.flatMap((day, i) =>
+                day?.restaurants?.map((restaurant, idx) => {
+                    const imageIndex = i * (day?.restaurants?.length || 0) + idx;
+                    return (
+                        <CardWrapper key={`${i}-${idx}`}>
+                            <Link to={`https://www.google.com/maps/search/${restaurant?.name}`} target="_blank">
+                                <img 
+                                    key={i} 
+                                    src={restaurantImages[imageIndex] || ''} 
+                                    className="w-full h-40 md:h-48 object-cover rounded-t-xl" 
+                                    alt="Restaurant" 
+                                    loading='lazy' 
+                                />
+                                <div className="p-4 md:p-6">
+                                    <h3 className="text-lg md:text-xl font-bold mb-2">{restaurant?.name}</h3>
+                                    <p className="text-sm md:text-base text-muted-foreground mb-2">Cuisine: {restaurant?.cuisine}</p>
+                                    <div className="flex items-center justify-between">
+                                        <span className="flex items-center gap-1 text-sm md:text-base">
+                                            <DollarSign className="w-4 h-4" />
+                                            {restaurant?.cost}
+                                        </span>
+                                        <span className="flex items-center gap-1 text-yellow-500">
+                                            <Star className="w-4 h-4 fill-current" />
+                                            {restaurant?.rating}
+                                        </span>
+                                    </div>
+                                </div>
+                            </Link>
+                        </CardWrapper>
+                    );
+                })
+            )}
+        </>
+    );
+});
 
 const BudgetSection = memo(({ budgetOverview }) => (
     <CardWrapper>
@@ -258,6 +336,7 @@ const TripData = ({ trip }) => {
         budgetOverview
     } = trip.data;
     const { config } = trip;
+
 
     return (
         <div className="p-6 md:p-10">
