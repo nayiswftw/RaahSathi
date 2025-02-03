@@ -53,26 +53,35 @@ const HotelsSection = memo(({ hotelOptions }) => {
     const [hotelImages, setHotelImages] = useState([]);
 
     useEffect(() => {
+        let isMounted = true;
+
         const loadImages = async () => {
+            if (!hotelOptions) return;
+            
             const images = await Promise.all(
-                hotelOptions?.map(async () => await fetchHotels())
+                Array(hotelOptions.length).fill().map(() => fetchHotels())
             );
-            setHotelImages(images);
+            
+            if (isMounted) {
+                setHotelImages(images);
+            }
         };
 
         loadImages();
+        return () => { isMounted = false; };
     }, [hotelOptions]);
+
+    if (!hotelOptions?.length) return null;
 
     return (
         <>
-            {hotelOptions?.map((hotel, i) => (
+            {hotelOptions.map((hotel, i) => (
                 <CardWrapper key={i}>
-                    <Link to={`https://www.google.com/maps/search/${hotel?.hotelName},${hotel?.hotelAddress}`} target="_blank">
+                    <Link to={`https://www.google.com/maps/search/${encodeURIComponent(`${hotel?.hotelName},${hotel?.hotelAddress}`)}`} target="_blank">
                         <img
-                            key={i}
                             src={hotelImages[i] || ''}
                             className="w-full h-40 md:h-48 object-cover rounded-t-xl"
-                            alt="Hotel"
+                            alt={`${hotel?.hotelName || 'Hotel'}`}
                             loading='lazy'
                         />
                         <div className="p-4 md:p-6">
@@ -117,49 +126,59 @@ const WeatherSection = memo(({ weatherForecast }) => (
 ));
 
 const SpotsSection = memo(({ touristSpots }) => {
-
-    
     const [spotImages, setSpotImages] = useState([]);
 
     useEffect(() => {
+        let isMounted = true;
+
         const loadImages = async () => {
+            if (!touristSpots) return;
+            
+            const totalSpots = touristSpots.reduce((acc, day) => 
+                acc + (day?.attractions?.length || 0), 0);
+            
             const images = await Promise.all(
-                touristSpots?.flatMap(day => 
-                    day?.attractions?.map(async () => await fetchSpots())
-                ) || []
+                Array(totalSpots).fill().map(() => fetchSpots())
             );
-            setSpotImages(images);
+            
+            if (isMounted) {
+                setSpotImages(images);
+            }
         };
 
         loadImages();
+        return () => { isMounted = false; };
     }, [touristSpots]);
+
+    if (!touristSpots?.length) return null;
 
     return (
         <>
-            {touristSpots?.flatMap((day, i) =>
-                day?.attractions?.map((attraction, idx) => {
+            {touristSpots.flatMap((day, i) =>
+                (day?.attractions || []).map((attraction, idx) => {
                     const imageIndex = i * (day?.attractions?.length || 0) + idx;
+                    if (!attraction) return null;
+
                     return (
                         <CardWrapper key={`${i}-${idx}`}>
-                            <Link to={`https://www.google.com/maps/search/${attraction?.name}`} target="_blank">
+                            <Link to={`https://www.google.com/maps/search/${encodeURIComponent(attraction.name)}`} target="_blank">
                                 <img 
-                                    key={idx} 
                                     src={spotImages[imageIndex] || ''} 
                                     className="w-full h-40 md:h-48 object-cover rounded-t-xl" 
-                                    alt="Attraction" 
+                                    alt={`${attraction.name} attraction`} 
                                     loading='lazy' 
                                 />
                                 <div className="p-4 md:p-6">
-                                    <h3 className="text-lg md:text-xl font-bold mb-2">{attraction?.name}</h3>
-                                    <p className="text-sm md:text-base text-muted-foreground mb-4">{attraction?.description}</p>
+                                    <h3 className="text-lg md:text-xl font-bold mb-2">{attraction.name}</h3>
+                                    <p className="text-sm md:text-base text-muted-foreground mb-4">{attraction.description}</p>
                                     <div className="flex items-center justify-between">
                                         <span className="flex items-center gap-1 text-sm md:text-base">
                                             <DollarSign className="w-4 h-4" />
-                                            {attraction?.estimatedCost}
+                                            {attraction.estimatedCost}
                                         </span>
                                         <span className="flex items-center gap-1 text-yellow-500">
                                             <Star className="w-4 h-4 fill-current" />
-                                            {attraction?.rating}
+                                            {attraction.rating}
                                         </span>
                                     </div>
                                 </div>
@@ -169,51 +188,65 @@ const SpotsSection = memo(({ touristSpots }) => {
                 })
             )}
         </>
-    )
+    );
 });
 
 const RestaurantsSection = memo(({ restaurantRecommendations }) => {
     const [restaurantImages, setRestaurantImages] = useState([]);
 
     useEffect(() => {
+        let isMounted = true;
+
         const loadImages = async () => {
+            if (!restaurantRecommendations) return;
+            
+            const totalRestaurants = restaurantRecommendations.reduce((acc, day) => 
+                acc + (day?.restaurants?.length || 0), 0);
+            
             const images = await Promise.all(
-                restaurantRecommendations?.flatMap(day => 
-                    day?.restaurants?.map(async () => await fetchRestaurants())
-                ) || []
+                Array(totalRestaurants).fill().map(() => fetchRestaurants())
             );
-            setRestaurantImages(images);
+            
+            if (isMounted) {
+                setRestaurantImages(images);
+            }
         };
 
         loadImages();
+        return () => { isMounted = false; };
     }, [restaurantRecommendations]);
+
+    if (!restaurantRecommendations?.length) return null;
 
     return (
         <>
-            {restaurantRecommendations?.flatMap((day, i) =>
-                day?.restaurants?.map((restaurant, idx) => {
+            {restaurantRecommendations.flatMap((day, i) =>
+                (day?.restaurants || []).map((restaurant, idx) => {
                     const imageIndex = i * (day?.restaurants?.length || 0) + idx;
+                    if (!restaurant) return null;
+
                     return (
                         <CardWrapper key={`${i}-${idx}`}>
-                            <Link to={`https://www.google.com/maps/search/${restaurant?.name}`} target="_blank">
+                            <Link to={`https://www.google.com/maps/search/${encodeURIComponent(restaurant.name)}`} target="_blank">
                                 <img 
-                                    key={i} 
                                     src={restaurantImages[imageIndex] || ''} 
                                     className="w-full h-40 md:h-48 object-cover rounded-t-xl" 
-                                    alt="Restaurant" 
-                                    loading='lazy' 
+                                    alt={`${restaurant.name} restaurant`}
+                                    loading='lazy'
                                 />
                                 <div className="p-4 md:p-6">
-                                    <h3 className="text-lg md:text-xl font-bold mb-2">{restaurant?.name}</h3>
-                                    <p className="text-sm md:text-base text-muted-foreground mb-2">Cuisine: {restaurant?.cuisine}</p>
+                                    <h3 className="text-lg md:text-xl font-bold mb-2">{restaurant.name}</h3>
+                                    <p className="text-sm md:text-base text-muted-foreground mb-2">
+                                        Cuisine: {restaurant.cuisine}
+                                    </p>
                                     <div className="flex items-center justify-between">
                                         <span className="flex items-center gap-1 text-sm md:text-base">
                                             <DollarSign className="w-4 h-4" />
-                                            {restaurant?.cost}
+                                            {restaurant.cost}
                                         </span>
                                         <span className="flex items-center gap-1 text-yellow-500">
                                             <Star className="w-4 h-4 fill-current" />
-                                            {restaurant?.rating}
+                                            {restaurant.rating}
                                         </span>
                                     </div>
                                 </div>
